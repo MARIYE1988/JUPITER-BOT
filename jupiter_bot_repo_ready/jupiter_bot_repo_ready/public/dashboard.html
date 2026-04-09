@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jupiter Swap Bot</title>
+  <style>
+    body{font-family:Arial,sans-serif;background:#0b1020;color:#e6eaf2;margin:0;padding:20px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .card{background:#141b34;border:1px solid #26304d;border-radius:14px;padding:16px}
+    input,button{width:100%;padding:10px;margin:6px 0;border-radius:10px;border:1px solid #33405f;background:#0f1730;color:#fff}
+    button{cursor:pointer;background:#2d6bff;border:none;font-weight:700}
+    button.stop{background:#d94b4b}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    td,th{border-bottom:1px solid #26304d;padding:8px;text-align:left;vertical-align:top}
+    .row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .muted{color:#97a3c0;font-size:13px}
+    .rules{display:grid;gap:12px}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#233050;color:#d8e3ff;font-size:12px}
+  </style>
+</head>
+<body>
+  <h1>Jupiter Swap Bot</h1>
+  <p class="muted">Create up to 10 rules. Each rule has its own start and stop control.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Add rule</h2>
+      <div class="row">
+        <input id="name" placeholder="Rule name" />
+        <input id="thresholdUsd" type="number" step="0.01" value="0" placeholder="Threshold USD" />
+      </div>
+      <input id="inputMint" placeholder="Input mint" />
+      <input id="outputMint" placeholder="Output mint" />
+      <div class="row">
+        <input id="swapAmountUsd" type="number" step="0.01" min="0.25" max="10" value="0.5" placeholder="Swap amount USD" />
+        <input id="intervalMin" type="number" min="1" max="59" value="3" placeholder="Interval minutes" />
+      </div>
+      <button onclick="addRule()">Save rule</button>
+    </div>
+    <div class="card">
+      <h2>Info panel</h2>
+      <div id="stats"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>Rules</h2>
+    <div id="rules" class="rules"></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>Transaction history</h2>
+    <table>
+      <thead>
+        <tr><th>Time</th><th>Rule</th><th>Status</th><th>Details</th></tr>
+      </thead>
+      <tbody id="history"></tbody>
+    </table>
+  </div>
+
+<script>
+async function api(url, opts = {}) { const r = await fetch(url, { headers: { 'content-type': 'application/json' }, ...opts }); return r.json(); }
+async function addRule() {
+  const body = { name: name.value, inputMint: inputMint.value, outputMint: outputMint.value, swapAmountUsd: +swapAmountUsd.value, intervalMin: +intervalMin.value, thresholdUsd: +thresholdUsd.value, enabled: false };
+  await api('/api/rules', { method: 'POST', body: JSON.stringify(body) }); load();
+}
+async function toggle(id, enable) { await api(`/api/rules/${id}/${enable ? 'start' : 'stop'}`, { method: 'POST' }); load(); }
+async function del(id) { await api(`/api/rules/${id}`, { method: 'DELETE' }); load(); }
+function render(state) {
+  stats.innerHTML = `<div><b>Rules:</b> ${state.rules.length}</div><div><b>Success:</b> ${state.totals.success}</div><div><b>Failure:</b> ${state.totals.failure}</div><div><b>Fees spent:</b> ${state.totals.feesSpent}</div>`;
+  rules.innerHTML = state.rules.map(r => `<div class="card"><b>${r.name}</b><div class="muted">${r.inputMint} → ${r.outputMint}</div><div>Amount: $${r.swapAmountUsd} | Every ${r.intervalMin} min | Threshold: $${r.thresholdUsd}</div><div>Status: <span class="pill">${r.enabled ? 'Running' : 'Stopped'}</span>${r.busy ? ' <span class="pill">Busy</span>' : ''}</div><div class="muted">Last run: ${r.lastRunAt || '—'}</div><div class="muted">Next run: ${r.nextRunAt || '—'}</div><button onclick="toggle('${r.id}', ${!r.enabled})">${r.enabled ? 'Stop' : 'Start'}</button><button class="stop" onclick="del('${r.id}')">Delete</button></div>`).join('');
+  history.innerHTML = state.history.slice(0, 25).map(h => `<tr><td>${h.ts || ''}</td><td>${h.ruleName || ''}</td><td>${h.status || ''}</td><td>${h.error || h.reason || h.execute?.signature || h.order?.requestId || ''}</td></tr>`).join('');
+}
+async function load() { render(await api('/api/state')); }
+load(); setInterval(load, 5000);
+</script>
+</body>
+</html>
