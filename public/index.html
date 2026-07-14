@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jupiter Bot Dashboard</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 2rem;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+      .card {
+        max-width: 760px;
+        margin: 0 auto;
+        background: #111827;
+        border: 1px solid #1f2937;
+        border-radius: 12px;
+        padding: 1.25rem;
+      }
+      h1 { margin-top: 0; }
+      button {
+        background: #2563eb;
+        color: white;
+        border: 0;
+        padding: 0.65rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      pre {
+        margin-top: 1rem;
+        background: #0b1220;
+        border: 1px solid #1f2937;
+        border-radius: 8px;
+        padding: 0.75rem;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Jupiter Bot Dashboard</h1>
+      <p>Frontend is live and served from <code>/public</code>.</p>
+      <button id="check">Check Health</button>
+      <pre id="out">Click the button to query /health</pre>
+    </div>
+    <script src="/app.js"></script>
+  </body>
+</html>
