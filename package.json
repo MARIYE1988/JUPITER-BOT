@@ -2,23 +2,6 @@
   "name": "swapbot-simple",
   "version": "1.0.0",
   "main": "server.js",
-  "type": "commonjs",
-  "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "migrate": "node migrate.js"
-  },
-  "dependencies": {
-    "@solana/web3.js": "^1.95.3",
-    "axios": "^1.7.4",
-    "bs58": "^6.0.0",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "express-rate-limit": "^7.4.1",
-    "pg": "^8.12.0",
-    "zod": "^3.23.8"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.4"
-  }
+  "type": "module",
+  ...
 }
