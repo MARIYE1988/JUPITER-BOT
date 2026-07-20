@@ -1,0 +1,35 @@
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+CREATE TABLE IF NOT EXISTS pairs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  input_mint TEXT NOT NULL,
+  output_mint TEXT NOT NULL,
+  input_price_id TEXT NOT NULL,
+  output_price_id TEXT NOT NULL,
+  interval_minutes INTEGER NOT NULL CHECK (interval_minutes > 0),
+  usd_amount NUMERIC NOT NULL CHECK (usd_amount > 0),
+  min_price NUMERIC NOT NULL DEFAULT 1 CHECK (min_price > 0),
+  entry_price NUMERIC,
+  enabled BOOLEAN NOT NULL DEFAULT true,
+  running BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS trades (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  pair_id UUID REFERENCES pairs(id) ON DELETE CASCADE,
+  status TEXT NOT NULL CHECK (status IN ('success','failed')),
+  tx_signature TEXT,
+  input_amount_usd NUMERIC,
+  output_amount_usd NUMERIC,
+  realized_earned_usd NUMERIC,
+  slippage_bps INTEGER,
+  quote_json JSONB,
+  error_message TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_pairs_running_enabled ON pairs(running, enabled);
+CREATE INDEX IF NOT EXISTS idx_trades_pair_created_at ON trades(pair_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trades_created_at ON trades(created_at DESC);
