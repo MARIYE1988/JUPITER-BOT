@@ -1,286 +1,31 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jupiter Bot Dashboard</title>
-    <style>
-      * { box-sizing: border-box; }
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        margin: 0;
-        padding: 2rem;
-        background: #0f172a;
-        color: #e2e8f0;
-      }
-      .container { max-width: 1200px; margin: 0 auto; }
-      h1 { margin-top: 0; color: #60a5fa; }
-      h2 { font-size: 1.3rem; color: #93c5fd; margin-top: 2rem; border-bottom: 2px solid #1f2937; padding-bottom: 0.5rem; }
-      .card {
-        background: #111827;
-        border: 1px solid #1f2937;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-      }
-      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-      .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
-      @media (max-width: 768px) { .grid, .grid-3 { grid-template-columns: 1fr; } }
-      
-      label {
-        display: block;
-        font-weight: 600;
-        margin-top: 1rem;
-        margin-bottom: 0.5rem;
-        font-size: 0.95rem;
-      }
-      input, select {
-        width: 100%;
-        padding: 0.75rem;
-        border: 1px solid #1f2937;
-        border-radius: 8px;
-        background: #0b1220;
-        color: #e2e8f0;
-        font-size: 1rem;
-      }
-      input:focus, select:focus {
-        outline: none;
-        border-color: #2563eb;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-      }
-      
-      button {
-        background: #2563eb;
-        color: white;
-        border: 0;
-        padding: 0.75rem 1.25rem;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: background 0.2s;
-        margin-top: 1rem;
-      }
-      button:hover { background: #1d4ed8; }
-      button:disabled {
-        background: #4b5563;
-        cursor: not-allowed;
-      }
-      
-      button.danger {
-        background: #dc2626;
-      }
-      button.danger:hover {
-        background: #b91c1c;
-      }
-      
-      button.success {
-        background: #16a34a;
-      }
-      button.success:hover {
-        background: #15803d;
-      }
-      
-      .stat-box {
-        background: #0b1220;
-        border: 1px solid #1f2937;
-        border-radius: 8px;
-        padding: 1rem;
-        text-align: center;
-      }
-      .stat-value {
-        font-size: 2rem;
-        font-weight: bold;
-        color: #60a5fa;
-        margin: 0.5rem 0;
-      }
-      .stat-label {
-        font-size: 0.85rem;
-        color: #9ca3af;
-        text-transform: uppercase;
-      }
-      
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 1rem;
-        font-size: 0.95rem;
-      }
-      th {
-        background: #0b1220;
-        text-align: left;
-        padding: 0.75rem;
-        border-bottom: 2px solid #1f2937;
-        font-weight: 600;
-      }
-      td {
-        padding: 0.75rem;
-        border-bottom: 1px solid #1f2937;
-      }
-      tr:hover { background: #0b1220; }
-      
-      .badge {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        font-weight: 600;
-      }
-      .badge-success { background: #065f46; color: #86efac; }
-      .badge-failure { background: #7f1d1d; color: #fca5a5; }
-      .badge-active { background: #1e3a8a; color: #60a5fa; }
-      .badge-inactive { background: #3f3f46; color: #a1a1aa; }
-      
-      .slider-container {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-      input[type="range"] {
-        width: 100%;
-        cursor: pointer;
-      }
-      .slider-value {
-        min-width: 50px;
-        text-align: center;
-        font-weight: 600;
-        color: #60a5fa;
-      }
-      
-      .error {
-        background: #7f1d1d;
-        border: 1px solid #dc2626;
-        color: #fca5a5;
-        padding: 0.75rem;
-        border-radius: 8px;
-        margin-top: 1rem;
-        display: none;
-      }
-      .error.show { display: block; }
-      
-      .success-msg {
-        background: #065f46;
-        border: 1px solid #16a34a;
-        color: #86efac;
-        padding: 0.75rem;
-        border-radius: 8px;
-        margin-top: 1rem;
-        display: none;
-      }
-      .success-msg.show { display: block; }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <h1>🚀 Jupiter Bot Dashboard</h1>
-      
-      <!-- Stats -->
-      <div class="card">
-        <h2>Bot Status</h2>
-        <div class="grid-3">
-          <div class="stat-box">
-            <div class="stat-label">Active Rules</div>
-            <div class="stat-value" id="activeRules">0</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">Total Trades</div>
-            <div class="stat-value" id="totalTrades">0</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">Success Rate</div>
-            <div class="stat-value" id="successRate">0%</div>
-          </div>
-        </div>
-        <div class="grid-3">
-          <div class="stat-box">
-            <div class="stat-label">Total Fees</div>
-            <div class="stat-value" id="totalFees">$0.00</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">Wins</div>
-            <div class="stat-value" id="winCount">0</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">Losses</div>
-            <div class="stat-value" id="lossCount">0</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Create Rule -->
-      <div class="card">
-        <h2>Create Trading Rule</h2>
-        <div class="grid">
-          <div>
-            <label>Rule Name</label>
-            <input type="text" id="ruleName" placeholder="e.g., SOL to USDC" />
-          </div>
-          <div>
-            <label>Input Token (from wallet)</label>
-            <input type="text" id="inputMint" placeholder="e.g., So11111111111111111111111111111111111111112" />
-          </div>
-        </div>
-
-        <div>
-          <label>Output Token</label>
-          <select id="outputMint">
-            <option value="">Select output token...</option>
-            <option value="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v">USDC</option>
-            <option value="Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB">USDT</option>
-            <option value="27G9ch6tNiNvSZS8c12tVGmt3fwDMb1NA5aVZ6DM5579">JLP</option>
-            <option value="FeKc2btj2vZqLSTjHddxNn2RssdMjcLH8XxC6X7X5Nyb">jupUSD</option>
-          </select>
-        </div>
-
-        <div class="grid">
-          <div>
-            <label>Swap Amount (USD)</label>
-            <input type="number" id="swapAmount" min="0.25" max="10" step="0.25" value="0.5" />
-            <small style="color: #9ca3af;">Range: $0.25 - $10</small>
-          </div>
-          <div>
-            <label>Interval (Minutes)</label>
-            <div class="slider-container">
-              <input type="range" id="intervalSlider" min="1" max="59" value="5" />
-              <div class="slider-value"><span id="intervalValue">5</span> min</div>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <label>Minimum Balance Threshold (USD)</label>
-          <div class="grid">
-            <div>
-              <input type="number" id="thresholdUsd" min="0" step="0.1" placeholder="0 = no threshold" />
-              <small style="color: #9ca3af;">Leave 0 for no minimum threshold</small>
-            </div>
-            <div style="display: flex; gap: 0.5rem;">
-              <button style="flex: 1;" onclick="resetThresholdToEntry()">Reset to Entry Balance</button>
-            </div>
-          </div>
-        </div>
-
-        <button onclick="createRule()">Create Rule</button>
-        <div id="createError" class="error"></div>
-        <div id="createSuccess" class="success-msg"></div>
-      </div>
-
-      <!-- Active Rules -->
-      <div class="card">
-        <h2>Active Rules</h2>
-        <div id="rulesContainer">
-          <p style="color: #9ca3af;">No active rules yet. Create one above!</p>
-        </div>
-      </div>
-
-      <!-- Trade History -->
-      <div class="card">
-        <h2>Trade History</h2>
-        <div id="historyContainer">
-          <p style="color: #9ca3af;">No trades yet.</p>
-        </div>
-      </div>
-    </div>
-
-    <script src="/app.js"></script>
-  </body>
-</html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Jupiter Swap Bot</title><style>
+body{font:16px system-ui;background:#0f172a;color:#e2e8f0;max-width:1100px;margin:auto;padding:24px}section{background:#172033;padding:20px;border-radius:12px;margin:18px 0}label{display:block;margin:12px 0}input,select,button{font:inherit;padding:8px;border-radius:6px;margin:4px;background:#0f172a;color:#e2e8f0;border:1px solid #64748b}input[type=text]{width:min(90%,520px)}button{cursor:pointer;background:#1d4ed8}table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:8px;border-bottom:1px solid #475569;overflow-wrap:anywhere}small{color:#cbd5e1}#message{white-space:pre-wrap;color:#fcd34d}.scroll{overflow:auto}.danger{background:#991b1b}</style></head>
+<body><h1>Jupiter Swap Bot</h1><p id="mode">Not connected. No trades initiated by this page.</p>
+<section><h2>Dashboard access</h2><label>API access token <input id="auth" type="password" autocomplete="off" placeholder="API_AUTH_TOKEN from Railway"></label><button id="connect">Connect</button><button id="stop" class="danger">Stop all rules</button><p>Token stays in this page's memory; it is not saved in browser storage.</p></section>
+<section><h2>Maximum permitted fees</h2><label>Maximum cost as a percentage of each swap: <output id="pctLabel">50%</output><br><input id="pct" type="range" min="0" max="50" step="0.1" value="50"></label><label><input id="strict" type="checkbox"> Enable optional stricter USD ceiling per swap</label><label>USD ceiling <input id="usd" type="number" min="0.000001" step="0.001" value="0.05"></label><p id="example"></p><button id="saveFees">Save fee limits for all rules</button><p>Always capped at 50%. If the USD toggle is on, the smaller limit wins. Unknown costs block the swap. Conservative estimates include quoted value loss/price impact and account rent, not only network fees. No Jupiter DCA is used.</p></section>
+<section><h2>Create rule</h2><label>Name <input id="name" type="text" value="Swap rule"></label><label>Input Solana mint <input id="input" type="text" placeholder="Source token mint address"></label><label>Output Solana mint <input id="output" type="text" value="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"></label><label>USD per swap <input id="amount" type="number" min="0.25" max="10" step="0.01" value="0.50"></label><label>Interval in minutes (1–1440) <input id="interval" type="number" min="1" max="1440" value="3"></label><label>Mode <select id="strategy"><option value="interval">Every interval</option><option value="price">Fixed token-price trigger</option></select></label><label>Fixed starting token price, USD <input id="baseline" type="number" min="0" step="any" value="0"></label><label>Token-price increase required, USD <input id="offset" type="number" min="0" step="any" value="1"></label><small>Price mode compares one token's USD price with starting price + increase. This is not a wallet-balance-value trigger. Baseline never resets automatically.</small><br><button id="create">Create paused rule</button></section>
+<p id="message" role="status"></p><section><h2>Rules (maximum 20)</h2><div id="rules"></div></section><section><h2>History</h2><p id="stats"></p><p>Fees shown here are estimates, not confirmed total actual fees. Failed or uncertain executions may still incur network fees. Performance graphs and complete actual-fee reconciliation are not included in this revision.</p><div class="scroll"><table><thead><tr><th>Time</th><th>Rule / status</th><th>Swap USD</th><th>Estimated cost</th><th>Allowed cost</th><th>Detail</th></tr></thead><tbody id="history"></tbody></table></div></section>
+<script type="module">
+const $ = id => document.getElementById(id); let token = ''; let connected = false;
+const message = text => $('message').textContent = text;
+async function api(url, method = 'GET', body) { const res = await fetch(url, { method, headers: { authorization: 'Bearer ' + token, 'content-type': 'application/json' }, ...(body === undefined ? {} : { body: JSON.stringify(body) }) }); const data = await res.json(); if (!res.ok) throw new Error(data.error || res.statusText); return data; }
+function preview() { $('pctLabel').textContent = $('pct').value + '%'; const percent = 0.5 * Number($('pct').value) / 100; const limit = $('strict').checked ? Math.min(percent, Number($('usd').value)) : percent; $('example').textContent = 'Example: a $0.50 swap permits at most $' + limit.toFixed(6) + ' estimated cost.'; $('usd').disabled = !$('strict').checked; }
+for (const id of ['pct','strict','usd']) $(id).addEventListener('input', preview); preview();
+function cell(row, text) { const td = document.createElement('td'); td.textContent = text ?? '—'; row.append(td); }
+async function refresh() {
+ const state = await api('/api/state'); $('mode').textContent = (state.live ? 'LIVE TRADING' : 'SIMULATION ONLY — no signing or broadcast') + ' | Wallet: ' + (state.walletPublicKey || 'not configured');
+ $('rules').replaceChildren();
+ for (const rule of state.rules) { const line = document.createElement('div'); const text = document.createElement('p'); text.textContent = `${rule.name}: ${rule.enabled ? 'RUNNING' : 'PAUSED'} | $${rule.swapAmountUsd} every ${rule.intervalMin} min | ${rule.mode} | max fees ${rule.feePolicy.maxFeePercent}%${rule.feePolicy.strictUsdEnabled ? ' / $' + rule.feePolicy.maxFeeUsd : ''}${rule.pendingSignature ? ' | PENDING: ' + rule.pendingSignature : ''}`; line.append(text);
+ for (const action of ['start','stop','delete']) { const button = document.createElement('button'); button.textContent = action; button.onclick = () => act(async () => { if (action === 'start' && state.live && !confirm('Enable LIVE recurring trades for ' + rule.name + '?')) return; await api('/api/rules/' + rule.id + (action === 'delete' ? '' : '/' + action), action === 'delete' ? 'DELETE' : 'POST'); await refresh(); }); line.append(button); } $('rules').append(line); }
+ $('stats').textContent = `Confirmed successful swaps: ${state.totals.success || 0} | Recorded errors: ${state.totals.failure || 0}`; $('history').replaceChildren();
+ for (const item of state.history.slice(0,200)) { const row = document.createElement('tr'); cell(row,item.ts); cell(row,item.ruleName + ' / ' + item.status); cell(row,item.desiredUsd); cell(row,item.fees?.estimatedCostUsd?.toFixed(6)); cell(row,item.feeCheck?.effectiveLimitUsd?.toFixed(6)); cell(row,item.error || item.skipReason || item.signature || ''); $('history').append(row); }
+ return state;
+}
+async function act(fn) { try { await fn(); } catch(e) { message(e.message); } }
+$('connect').onclick = () => act(async () => { token = $('auth').value; const state = await refresh(); connected = true; $('auth').value = ''; $('pct').value = state.feePolicy.maxFeePercent; $('strict').checked = state.feePolicy.strictUsdEnabled; $('usd').value = state.feePolicy.maxFeeUsd; preview(); message('Connected. Review fee settings before starting rules.'); });
+$('saveFees').onclick = () => act(async () => { await api('/api/fees','PUT',{ maxFeePercent: Number($('pct').value), strictUsdEnabled: $('strict').checked, maxFeeUsd: Number($('usd').value) }); message('Fee settings saved for all existing and future rules.'); await refresh(); });
+$('create').onclick = () => act(async () => { await api('/api/rules','POST',{ name: $('name').value, inputMint: $('input').value.trim(), outputMint: $('output').value.trim(), swapAmountUsd: Number($('amount').value), intervalMin: Number($('interval').value), mode: $('strategy').value, originalStartPrice: Number($('baseline').value), triggerOffset: Number($('offset').value) }); message('Rule created paused.'); await refresh(); });
+$('stop').onclick = () => act(async () => { await api('/api/stop','POST'); message('All rules stopped. Already submitted transactions cannot be cancelled.'); await refresh(); });
+setInterval(() => { if (connected) act(refresh); }, 10000);
+</script></body></html>
